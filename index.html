@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalkMe Variable Calculator</title>
+    <style>
+        :root {
+            --walkme-blue: #1E88E5;
+            --walkme-dark-blue: #1565C0;
+            --walkme-light-blue: #E3F2FD;
+            --walkme-accent: #42A5F5;
+            --walkme-dark: #212121;
+            --walkme-gray: #757575;
+            --walkme-light-gray: #F5F5F5;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--walkme-blue) 0%, var(--walkme-dark-blue) 100%);
+            min-height: 100vh;
+            color: var(--walkme-dark);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .walkme-logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .walkme-logo .walk {
+            color: white;
+        }
+        
+        .walkme-logo .me {
+            background: white;
+            color: var(--walkme-blue);
+            padding: 8px 16px;
+            border-radius: 25px;
+            margin-left: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: var(--walkme-light-gray);
+            border-bottom: 3px solid var(--walkme-blue);
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            background: var(--walkme-light-gray);
+            color: var(--walkme-gray);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: var(--walkme-blue);
+            transform: translateY(3px);
+        }
+        
+        .nav-tab:hover:not(.active) {
+            background: #E8E8E8;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: var(--walkme-blue);
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--walkme-dark);
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--walkme-blue);
+            box-shadow: 0 0 0 3px var(--walkme-light-blue);
+        }
+        
+        .btn {
+            background: var(--walkme-blue);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: var(--walkme-dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--walkme-gray);
+        }
+        
+        .btn-secondary:hover {
+            background: #616161;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        /* 結果表示エリア（Smart Walk-Thrus用） */
+        .result-container {
+            margin-top: 25px;
+            padding: 20px;
+            background: var(--walkme-light-blue);
+            border-radius: 15px;
+            border-left: 5px solid var(--walkme-blue);
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: var(--walkme-dark);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .result-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--walkme-blue);
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid var(--walkme-blue);
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .url-section {
+            background: #FFF9C4;
+            border: 2px solid #FFC107;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .url-section h3 {
+            color: #F57C00;
+            margin-top: 0;
+        }
+        
+        .example-box {
+            background: var(--walkme-light-gray);
+            border-left: 4px solid var(--walkme-blue);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .example-box h4 {
+            color: var(--walkme-blue);
+            margin-top: 0;
+        }
+        
+        .code {
+            font-family: 'Courier New', monospace;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-ready {
+            background: #4CAF50;
+        }
+        
+        .status-calculating {
+            background: #FF9800;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="walkme-logo">
+                <span class="walk">walk</span><span class="me">me</span>
+            </div>
+        </div>
+        <div class="subtitle">Variable Calculator & Processor</div>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('calc')">🔢 数値計算</button>
+            <button class="nav-tab" onclick="showTab('text')">📝 テキスト処理</button>
+            <button class="nav-tab" onclick="showTab('advanced')">⚡ 高度な処理</button>
+            <button class="nav-tab" onclick="showTab('url')">🔗 URL連携</button>
+        </div>
+
+        <!-- 数値計算タブ -->
+        <div id="calc" class="tab-content active">
+            <div class="section-title">
+                <span class="status-indicator status-ready"></span>
+                数値計算処理
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label>数値A:</label>
+                    <input type="number" id="numA" step="any" placeholder="例: 10.5">
+                </div>
+                <div class="input-group">
+                    <label>数値B:</label>
+                    <input type="number" id="numB" step="any" placeholder="例: 3.2">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>演算種類:</label>
+                <select id="operation">
+                    <option value="add">加算 (A + B)</option>
+                    <option value="subtract">減算 (A - B)</option>
+                    <option value="multiply">乗算 (A × B)</option>
+                    <option value="divide">除算 (A ÷ B)</option>
+                    <option value="power">べき乗 (A ^ B)</option>
+                    <option value="modulo">剰余 (A % B)</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="calculate()">📊 計算実行</button>
+            <button class="btn btn-secondary" onclick="clearNumbers()">🗑️ クリア</button>
+            
+            <div id="mathResultContainer" class="result-container hidden">
+                <div class="result-label">計算結果</div>
+                <div id="mathResult" class="result-value" data-walkme="math-result">-</div>
+            </div>
+        </div>
+
+        <!-- テキスト処理タブ -->
+        <div id="text" class="tab-content">
+            <div class="section-title">
+                <span class="status-indicator status-ready"></span>
+                テキスト処理
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label>テキスト1:</label>
+                    <input type="text" id="text1" placeholder="例: Hello">
+                </div>
+                <div class="input-group">
+                    <label>テキスト2:</label>
+                    <input type="text" id="text2" placeholder="例: World">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>区切り文字:</label>
+                <input type="text" id="separator" placeholder="例: スペース、カンマ等" value=" ">
+            </div>
+            
+            <button class="btn" onclick="concatText()">🔗 結合</button>
+            <button class="btn" onclick="textToUpper()">🔤 大文字化</button>
+            <button class="btn" onclick="textToLower()">🔡 小文字化</button>
+            <button class="btn" onclick="getTextLength()">📏 文字数取得</button>
+            <button class="btn btn-secondary" onclick="clearText()">🗑️ クリア</button>
+            
+            <div id="textResultContainer" class="result-container hidden">
+                <div class="result-label">処理結果</div>
+                <div id="textResult" class="result-value" data-walkme="text-result">-</div>
+            </div>
+        </div>
+
+        <!-- 高度な処理タブ -->
+        <div id="advanced" class="tab-content">
+            <div class="section-title">
+                <span class="status-indicator status-ready"></span>
+                高度な数式処理
+            </div>
+            
+            <div class="input-group">
+                <label>計算式 (JavaScript形式):</label>
+                <textarea id="formula" rows="4" placeholder="例: Math.sqrt(numA) + Math.pow(numB, 2)">Math.round((numA + numB) * 100) / 100</textarea>
+            </div>
+            
+            <button class="btn" onclick="advancedCalculate()">⚡ 高度な計算実行</button>
+            
+            <div id="advancedResultContainer" class="result-container hidden">
+                <div class="result-label">計算結果</div>
+                <div id="advancedResult" class="result-value" data-walkme="advanced-result">-</div>
+            </div>
+        </div>
+
+        <!-- URL連携タブ -->
+        <div id="url" class="tab-content">
+            <div class="section-title">
+                <span class="status-indicator status-ready"></span>
+                URL連携設定
+            </div>
+            
+            <button class="btn" onclick="loadFromUrl()">📥 URLパラメータから読み込み</button>
+            <button class="btn btn-success" onclick="generateUrl()">🔗 現在の値でURL生成</button>
+            
+            <div id="urlResultContainer" class="url-section hidden">
+                <h3>生成されたURL</h3>
+                <div id="urlResult" class="code"></div>
+                <button class="btn btn-success" id="copyBtn" onclick="copyGeneratedUrl()">📋 URLをコピー</button>
+            </div>
+            
+            <div class="example-box">
+                <h4>🔧 Smart Walk-Thrusでの使用方法</h4>
+                <p><strong>1. URLパラメータで値を渡す:</strong></p>
+                <div class="code">https://yoursite.github.io/calculator/?numA=10&numB=5&operation=add&text1=Hello&text2=World</div>
+                
+                <p><strong>2. 結果を取得する要素セレクター:</strong></p>
+                <div class="code">
+                    数値計算結果: [data-walkme="math-result"]<br>
+                    テキスト処理結果: [data-walkme="text-result"]<br>
+                    高度な計算結果: [data-walkme="advanced-result"]
+                </div>
+                
+                <p><strong>3. Smart Walk-Thruでの実装例:</strong></p>
+                <div class="code">
+                    1. ブラウザアクション → URL遷移<br>
+                    2. 要素待機 → [data-walkme="math-result"]<br>
+                    3. テキスト取得 → 結果を変数に保存<br>
+                    4. 次のステップで使用
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let generatedUrl = '';
+        
+        // タブ切り替え
+        function showTab(tabName) {
+            // すべてのタブコンテンツを非表示
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // すべてのタブボタンを非アクティブ
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 選択されたタブを表示
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // URLパラメータから値を取得
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                numA: params.get('numA') || '',
+                numB: params.get('numB') || '',
+                operation: params.get('operation') || 'add',
+                text1: params.get('text1') || '',
+                text2: params.get('text2') || '',
+                separator: params.get('separator') || ' '
+            };
+        }
+        
+        // ページ読み込み時にURLパラメータを適用
+        window.onload = function() {
+            const params = getUrlParams();
+            document.getElementById('numA').value = params.numA;
+            document.getElementById('numB').value = params.numB;
+            document.getElementById('operation').value = params.operation;
+            document.getElementById('text1').value = params.text1;
+            document.getElementById('text2').value = params.text2;
+            document.getElementById('separator').value = params.separator;
+            
+            // URLパラメータがあれば自動実行
+            if (params.numA && params.numB) {
+                calculate();
+            }
+            if (params.text1 || params.text2) {
+                concatText();
+            }
+        };
+        
+        // 数値計算
+        function calculate() {
+            setStatus('calc', 'calculating');
+            
+            const numA = parseFloat(document.getElementById('numA').value);
+            const numB = parseFloat(document.getElementById('numB').value);
+            const operation = document.getElementById('operation').value;
+            
+            if (isNaN(numA) || isNaN(numB)) {
+                showResult('mathResult', 'mathResultContainer', 'エラー: 有効な数値を入力してください');
+                setStatus('calc', 'ready');
+                return;
+            }
+            
+            let result;
+            switch(operation) {
+                case 'add': result = numA + numB; break;
+                case 'subtract': result = numA - numB; break;
+                case 'multiply': result = numA * numB; break;
+                case 'divide': 
+                    if (numB === 0) {
+                        showResult('mathResult', 'mathResultContainer', 'エラー: ゼロで除算はできません');
+                        setStatus('calc', 'ready');
+                        return;
+                    }
+                    result = numA / numB; 
+                    break;
+                case 'power': result = Math.pow(numA, numB); break;
+                case 'modulo': result = numA % numB; break;
+            }
+            
+            showResult('mathResult', 'mathResultContainer', result);
+            setStatus('calc', 'ready');
+        }
+        
+        // テキスト結合
+        function concatText() {
+            setStatus('text', 'calculating');
+            
+            const text1 = document.getElementById('text1').value;
+            const text2 = document.getElementById('text2').value;
+            const separator = document.getElementById('separator').value;
+            
+            const result = text1 + separator + text2;
+            showResult('textResult', 'textResultContainer', result);
+            setStatus('text', 'ready');
+        }
+        
+        // テキスト大文字化
+        function textToUpper() {
+            setStatus('text', 'calculating');
+            
+            const text1 = document.getElementById('text1').value;
+            const text2 = document.getElementById('text2').value;
+            const result = `${text1.toUpperCase()} | ${text2.toUpperCase()}`;
+            showResult('textResult', 'textResultContainer', result);
+            setStatus('text', 'ready');
+        }
+        
+        // テキスト小文字化
+        function textToLower() {
+            setStatus('text', 'calculating');
+            
+            const text1 = document.getElementById('text1').value;
+            const text2 = document.getElementById('text2').value;
+            const result = `${text1.toLowerCase()} | ${text2.toLowerCase()}`;
+            showResult('textResult', 'textResultContainer', result);
+            setStatus('text', 'ready');
+        }
+        
+        // 文字数取得
+        function getTextLength() {
+            setStatus('text', 'calculating');
+            
+            const text1 = document.getElementById('text1').value;
+            const text2 = document.getElementById('text2').value;
+            const result = `${text1.length} | ${text2.length}`;
+            showResult('textResult', 'textResultContainer', result);
+            setStatus('text', 'ready');
+        }
+        
+        // 高度な計算
+        function advancedCalculate() {
+            setStatus('advanced', 'calculating');
+            
+            const numA = parseFloat(document.getElementById('numA').value) || 0;
+            const numB = parseFloat(document.getElementById('numB').value) || 0;
+            const formula = document.getElementById('formula').value;
+            
+            try {
+                const result = eval(formula);
+                showResult('advancedResult', 'advancedResultContainer', result);
+            } catch (error) {
+                showResult('advancedResult', 'advancedResultContainer', `エラー: ${error.message}`);
+            }
+            
+            setStatus('advanced', 'ready');
+        }
+        
+        // URLパラメータから読み込み
+        function loadFromUrl() {
+            const params = getUrlParams();
+            document.getElementById('numA').value = params.numA;
+            document.getElementById('numB').value = params.numB;
+            document.getElementById('operation').value = params.operation;
+            document.getElementById('text1').value = params.text1;
+            document.getElementById('text2').value = params.text2;
+            document.getElementById('separator').value = params.separator;
+            
+            alert('URLパラメータから値を読み込みました');
+        }
+        
+        // URL生成
+        function generateUrl() {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams({
+                numA: document.getElementById('numA').value,
+                numB: document.getElementById('numB').value,
+                operation: document.getElementById('operation').value,
+                text1: document.getElementById('text1').value,
+                text2: document.getElementById('text2').value,
+                separator: document.getElementById('separator').value
+            });
+            
+            generatedUrl = `${baseUrl}?${params.toString()}`;
+            document.getElementById('urlResult').innerHTML = `<a href="${generatedUrl}" target="_blank">${generatedUrl}</a>`;
+            document.getElementById('urlResultContainer').classList.remove('hidden');
+        }
+        
+        // 生成されたURLをコピー
+        function copyGeneratedUrl() {
+            if (generatedUrl) {
+                navigator.clipboard.writeText(generatedUrl).then(() => {
+                    alert('URLをクリップボードにコピーしました！');
+                });
+            }
+        }
+        
+        // 結果表示（Smart Walk-Thrus用に要素を分離）
+        function showResult(resultElementId, containerElementId, value) {
+            const resultElement = document.getElementById(resultElementId);
+            const containerElement = document.getElementById(containerElementId);
+            
+            resultElement.textContent = value;
+            containerElement.classList.remove('hidden');
+        }
+        
+        // ステータス表示
+        function setStatus(section, status) {
+            const indicators = document.querySelectorAll(`#${section} .status-indicator`);
+            indicators.forEach(indicator => {
+                indicator.className = `status-indicator status-${status}`;
+            });
+        }
+        
+        // クリア機能
+        function clearNumbers() {
+            document.getElementById('numA').value = '';
+            document.getElementById('numB').value = '';
+            document.getElementById('mathResultContainer').classList.add('hidden');
+        }
+        
+        function clearText() {
+            document.getElementById('text1').value = '';
+            document.getElementById('text2').value = '';
+            document.getElementById('textResultContainer').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
